@@ -34,12 +34,12 @@ t=$(tail -n1 $logfile | awk -F ":" '{print $2 $3}')
 
 d=$(date -d "$t 5 minute ago" "+%H%M" )
 
-echo t= $t
-echo d= $d
+#echo t= $t
+#echo d= $d
 
 #убираем дату (на проде убрать --date -3 day)
 dfix=$(date +"%d/%b/%Y:" --date '-23 day')
-echo dfix= $dfix
+#echo dfix= $dfix
 cat $logfile | awk -v lo="$lo" -v sp="	" -F "$dfix" '{print lo sp $1 $2}' | awk -F ":" '{print $1 $2}'  > log2.tmp
 
 sed -n -i "/${d}/,/${t}/{//!p}" log2.tmp
@@ -66,7 +66,7 @@ user=$(echo $ban | awk -F " " '{print $1}')
 ip=$(echo $ban | awk -F " " '{print $2}')
 
 #echo $user
-echo $ip
+#echo $ip
 
 #echo $ip >> vhosts/$user/*site.conf
 
