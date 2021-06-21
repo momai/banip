@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #Выполняем действие, если кол-во подключений к nginx больше connect в данный момент
-connect="500"
+connect="0"
 
 #Выполняется действие (при соблюдении условия connect), если кол-во обращений с одного IP больше n (на основе лога nginx за последние 5 минут)
 n=3
@@ -17,8 +17,8 @@ echo выполняем
 
 
 #ищем логи
-find log/. -name "*access*" -type f -exec basename {} \; | cut -d "." -f 1 > user.id
-find log/ -name "*access*"  -type f -exec basename {} \; > log.id
+find $logfiles/. -name "*access*" -type f -exec basename {} \; | cut -d "." -f 1 > user.id
+find $logfiles/ -name "*access*"  -type f -exec basename {} \; > log.id
 
 
 
