@@ -1,9 +1,14 @@
 #!/bin/bash
 
+#Выполняется действие, если кол-во обращений с одного IP больше n (на основе лога nginx)
 n=3
-connect="0"
-realconnect=$(netstat -an | grep :443 | wc -l)
+#Выполняем действие, если кол-во подключений к nginx больше connect
+connect="500"
+
+#Путь до дирректории с логами nginx
 logfiles=log
+
+realconnect=$(netstat -an | grep :443 | wc -l)
 
 echo $realconnect
 if [ $realconnect -ge $connect ]; then
