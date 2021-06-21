@@ -49,8 +49,8 @@ d=$(date -d "$t 5 minute ago" "+%H%M" )
 echo t= $t
 echo d= $d
 
-#убираем дату (на проде убрать --date -3 day)
-dfix=$(date +"%d/%b/%Y:" --date '-28 day')
+#убираем дату (на проде убрать --date -28 day)
+dfix=$(date +"%d/%b/%Y:")
 echo dfix= $dfix
 
 #выводить имена учетных записей ipsmanager в конечный файл
