@@ -1,8 +1,12 @@
 #!/bin/bash
 
-connect=$(netstat -an | grep :443 | wc -l)
-echo $connect
-if [ $connect -ge 0 ]; then
+n=3
+connect="0"
+realconnect=$(netstat -an | grep :443 | wc -l)
+logfiles=log
+
+echo $realconnect
+if [ $realconnect -ge $connect ]; then
 echo выполняем
 
 
@@ -28,12 +32,8 @@ lo="$log"
 #lo=$(cat '$log' | awk -F "." '{print $1}')
 #lo=$(cat '$log' | cut -d "." -f 1)
 #echo "$lo"
-n=3
 LANG=en_us_8859_1
-logfile=log/$log
-#logfile=logs
-#очищаем старый вывод
-#echo -n > final
+logfile=$logfiles/$log
 
 #вычесляем время последней записи
 t=$(tail -n1 $logfile | awk -F ":" '{print $2 $3}')
@@ -102,7 +102,7 @@ user=$(echo $ban | awk -F " " '{print $1}')
 ip=$(echo $ban | awk -F " " '{print $1}')
 
 #echo $user
-#echo $ip
+echo $ip
 
 #echo $ip >> vhosts/$user/*site.conf
 
