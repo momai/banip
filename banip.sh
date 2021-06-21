@@ -96,9 +96,10 @@ while read ban; do
 
 #echo $ban >> vhosts/$ban/*site.conf
 
-
+#если final4 со списокм пользователей, то: print $1 - user, print $2 - IP.
+#если final4 только с IP то: print $1 - ip. user игнорируется
 user=$(echo $ban | awk -F " " '{print $1}')
-ip=$(echo $ban | awk -F " " '{print $2}')
+ip=$(echo $ban | awk -F " " '{print $1}')
 
 #echo $user
 echo $ip
