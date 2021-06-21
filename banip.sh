@@ -1,5 +1,11 @@
 #!/bin/bash
 
+connect=$(netstat -an | grep :443 | wc -l)
+echo $connect
+if [ $connect -ge 500 ]; then
+echo выполняем
+
+
 #ищем логи
 find log/. -name "*access*" -type f -exec basename {} \; | cut -d "." -f 1 > user.id
 find log/ -name "*access*"  -type f -exec basename {} \; > log.id
@@ -84,4 +90,8 @@ sort -u final3 > final4
 done < $FILE
 #rm -rf final2 final3
 
+
+else
+echo не выполняем
+fi
 
