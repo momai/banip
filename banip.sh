@@ -2,7 +2,7 @@
 
 connect=$(netstat -an | grep :443 | wc -l)
 echo $connect
-if [ $connect -ge 500 ]; then
+if [ $connect -ge 0 ]; then
 echo выполняем
 
 
@@ -102,7 +102,7 @@ user=$(echo $ban | awk -F " " '{print $1}')
 ip=$(echo $ban | awk -F " " '{print $1}')
 
 #echo $user
-echo $ip
+#echo $ip
 
 #echo $ip >> vhosts/$user/*site.conf
 
