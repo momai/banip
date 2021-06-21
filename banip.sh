@@ -90,6 +90,33 @@ sort -u final3 > final4
 done < $FILE
 #rm -rf final2 final3
 
+FILE=final4
+while read ban; do
+#     echo "user: $ban"
+
+#echo $ban >> vhosts/$ban/*site.conf
+
+
+user=$(echo $ban | awk -F " " '{print $1}')
+ip=$(echo $ban | awk -F " " '{print $2}')
+
+#echo $user
+echo $ip
+
+#echo $ip >> vhosts/$user/*site.conf
+
+#awk 'NR==5{print "new line text"}7' file
+
+#echo $ip | awk '{print $(NF-1)}'
+
+ipdate=$(date +"%Y-%m-%dT%H:%M")
+ipdatemin=$(date +"%Y-%m-%dT%H:%M" --date '+5 min')
+
+#iptables -t filter -A INTPUT -s $ip/32 -m time --utc --datestart $ipdate --datestop $ipdatemin -j DROP
+
+#echo "         if (`$remote_addr` ~ ($ip)) {         return 404;}" >> vhosts/$user/*site.conf
+done < $FILE
+
 
 else
 echo не выполняем
