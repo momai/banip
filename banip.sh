@@ -50,7 +50,7 @@ echo t= $t
 echo d= $d
 
 #убираем дату (на проде убрать --date '-28 day')
-dfix=$(date +"%d/%b/%Y:" --date '-30 day')
+dfix=$(date +"%d/%b/%Y:")
 echo dfix= $dfix
 
 #выводить имена учетных записей ipsmanager в конечный файл
