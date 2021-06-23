@@ -7,7 +7,7 @@ connect="0"
 n=30
 
 #Путь до дирректории с логами nginx
-logfiles=/var/log/nginx/
+logfiles=log
 
 realconnect=$(netstat -an | grep :443 | wc -l)
 
@@ -50,7 +50,7 @@ echo t= $t
 echo d= $d
 
 #убираем дату (на проде убрать --date '-28 day')
-dfix=$(date +"%d/%b/%Y:" --date '-15 day')
+dfix=$(date +"%d/%b/%Y:" --date '-30 day')
 echo dfix= $dfix
 
 #выводить имена учетных записей ipsmanager в конечный файл
@@ -121,7 +121,7 @@ ipdatemin=$(date +"%Y-%m-%dT%H:%M" --date '+5 min')
 
 #iptables -t filter -A INTPUT -s $ip/32 -m time --utc --datestart $ipdate --datestop $ipdatemin -j DROP
 
-iptables -I INPUT -s $ip/32 -m time --utc --datestart $ipdate --datestop $ipdatemin -j DROP
+#iptables -I INPUT -s $ip/32 -m time --utc --datestart $ipdate --datestop $ipdatemin -j DROP
 
 #echo "         if (`$remote_addr` ~ ($ip)) {         return 404;}" >> vhosts/$user/*site.conf
 done < $FILE
