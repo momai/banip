@@ -54,10 +54,10 @@ dfix=$(date +"%d/%b/%Y:")
 echo dfix= $dfix
 
 #выводить имена учетных записей ipsmanager в конечный файл
-#cat $logfile | awk -v lo="$lo" -v sp="	" -F "$dfix" '{print lo sp $1 $2}' | awk -F ":" '{print $1 $2}'  > log2.tmp
+cat $logfile | awk -v lo="$lo" -v sp="	" -F "$dfix" '{print lo sp $1 $2}' | awk -F ":" '{print $1 $2}'  > log2.tmp
 
 #сформировать список ип адресов в конечном файле
-cat $logfile | awk -F "$dfix" '{print $1 $2}' | awk -F ":" '{print $1 $2}'  > log2.tmp
+#cat $logfile | awk -F "$dfix" '{print $1 $2}' | awk -F ":" '{print $1 $2}'  > log2.tmp
 #echo log.tmp
 #cat log.tmp
 
@@ -105,7 +105,7 @@ while read ban; do
 #если final4 со списокм пользователей, то: print $1 - user, print $2 - IP.
 #если final4 только с IP то: print $1 - ip. user игнорируется
 user=$(echo $ban | awk -F " " '{print $1}')
-ip=$(echo $ban | awk -F " " '{print $1}')
+ip=$(echo $ban | awk -F " " '{print $2}')
 
 #echo $user
 echo $ip
