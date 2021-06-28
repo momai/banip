@@ -1,5 +1,6 @@
 #!/bin/bash
-
+echo  "##"
+echo -e "\033[37;1;41m  version 0.4 \033[0m fix defining the last line "
 #Выполняем действие, если кол-во подключений к nginx больше connect в данный момент
 connect="0"
 
@@ -11,11 +12,11 @@ logfiles=log
 
 realconnect=$(netstat -an | grep :443 | wc -l)
 
-echo $realconnect
+#echo $realconnect
 if [ $realconnect -ge $connect ]; then
-echo выполняем
+#echo выполняем
 
-
+touch user.id log.id log2.tmp ip2.tmp number2 final2 final3 final4
 #ищем логи
 find $logfiles/. -name "*access*" -type f -exec basename {} \; | cut -d "." -f 1 > user.id
 find $logfiles/ -name "*access*"  -type f -exec basename {} \; > log.id
@@ -42,7 +43,9 @@ LANG=en_us_8859_1
 logfile=$logfiles/$log
 
 #вычесляем время последней записи
-t=$(tail -n1 $logfile | awk -F ":" '{print $2 $3}')
+#t=$(tail -n1 $logfile | awk -F ":" '{print $2 $3}')
+
+t=$(cat $logfile | tail -n 5 | head -1 | awk -F ":" '{print $2 $3}')
 
 d=$(date -d "$t 5 minute ago" "+%H%M" )
 
@@ -50,7 +53,7 @@ echo t= $t
 echo d= $d
 
 #убираем дату (на проде убрать --date '-28 day')
-dfix=$(date +"%d/%b/%Y:")
+dfix=$(date +"%d/%b/%Y:" --date '-25 day')
 echo dfix= $dfix
 
 #выводить имена учетных записей ipsmanager в конечный файл
@@ -108,7 +111,7 @@ user=$(echo $ban | awk -F " " '{print $1}')
 ip=$(echo $ban | awk -F " " '{print $2}')
 
 #echo $user
-echo $ip
+#echo $ip
 
 #echo $ip >> vhosts/$user/*site.conf
 
