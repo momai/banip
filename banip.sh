@@ -1,6 +1,7 @@
 #!/bin/bash
 echo  "##"
 echo -e "\033[37;1;41m  version 0.4 \033[0m fix defining the last line "
+
 #Выполняем действие, если кол-во подключений к nginx больше connect в данный момент
 connect="0"
 
@@ -42,7 +43,7 @@ lo="$log"
 LANG=en_us_8859_1
 logfile=$logfiles/$log
 
-#вычесляем время последней записи
+#вычесляем время последней записи. Берётся 5я строчка с конца файла
 #t=$(tail -n1 $logfile | awk -F ":" '{print $2 $3}')
 
 t=$(cat $logfile | tail -n 5 | head -1 | awk -F ":" '{print $2 $3}')
@@ -53,7 +54,7 @@ echo t= $t
 echo d= $d
 
 #убираем дату (на проде убрать --date '-28 day')
-dfix=$(date +"%d/%b/%Y:" --date '-25 day')
+dfix=$(date +"%d/%b/%Y:")
 echo dfix= $dfix
 
 #выводить имена учетных записей ipsmanager в конечный файл
