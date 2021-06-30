@@ -1,4 +1,4 @@
-#!/bin/bash
+ #!/bin/bash
 echo  "##"
 echo -e "\033[37;1;41m  version 0.4 \033[0m fix defining the last line "
 
@@ -6,18 +6,22 @@ echo -e "\033[37;1;41m  version 0.4 \033[0m fix defining the last line "
 connect="0"
 
 #Выполняется действие (при соблюдении условия connect), если кол-во обращений с одного IP больше n (на основе лога nginx за последние 5 минут)
-n=30
+n=0
 
 #Путь до дирректории с логами nginx
 logfiles=log
+
+# Путь до дирректории со скриптом. В конце / не ставить.
+home="/home/momai/test/banip/banip"
+cd $home
 
 realconnect=$(netstat -an | grep :443 | wc -l)
 
 #echo $realconnect
 if [ $realconnect -ge $connect ]; then
-#echo выполняем
+echo выполняем
 
-touch user.id log.id log2.tmp ip2.tmp number2 final2 final3 final4
+#rm -rf user.id log.id log2.tmp ip2.tmp number2 final2 final3 final4
 #ищем логи
 find $logfiles/. -name "*access*" -type f -exec basename {} \; | cut -d "." -f 1 > user.id
 find $logfiles/ -name "*access*"  -type f -exec basename {} \; > log.id
@@ -39,31 +43,29 @@ while read log; do
 lo="$log"
 #lo=$(cat '$log' | awk -F "." '{print $1}')
 #lo=$(cat '$log' | cut -d "." -f 1)
-#echo "$lo"
+echo "$lo"
 LANG=en_us_8859_1
 logfile=$logfiles/$log
 
 #вычесляем время последней записи. Берётся 5я строчка с конца файла
-#t=$(tail -n1 $logfile | awk -F ":" '{print $2 $3}')
+t=$(tail -n1 $logfile | awk -F ":" '{print $2 $3}')
 
-t=$(cat $logfile | tail -n 5 | head -1 | awk -F ":" '{print $2 $3}')
+#t=$(cat $logfile | tail -n 5 | head -1 | awk -F ":" '{print $2 $3}')
 
 d=$(date -d "$t 5 minute ago" "+%H%M" )
 
 echo t= $t
 echo d= $d
 
-#убираем дату (на проде убрать --date '-28 day')
+#убираем дату (на проде убрать --date '-37 day')
 dfix=$(date +"%d/%b/%Y:")
 echo dfix= $dfix
 
 #выводить имена учетных записей ipsmanager в конечный файл
 cat $logfile | awk -v lo="$lo" -v sp="	" -F "$dfix" '{print lo sp $1 $2}' | awk -F ":" '{print $1 $2}'  > log2.tmp
-
+#cat log2.tmp
 #сформировать список ип адресов в конечном файле
 #cat $logfile | awk -F "$dfix" '{print $1 $2}' | awk -F ":" '{print $1 $2}'  > log2.tmp
-#echo log.tmp
-#cat log.tmp
 
 #вырезаем отрезок из логов
 sed -n -i "/${d}/,/${t}/{//!p}" log2.tmp
@@ -79,6 +81,10 @@ sort -nr -o number2 number2
 
 #отсекаем лишние адреса на основе $n
 cat number2 | awk -v n="$n" '{ if ($1>n) print $2 " ", $3 >> "final2"; }'
+# Список юзеров на блокировку
+cat number2 | awk -v n="$n" '{ if ($1>n) print $2 >> "user4.tmp"; }'
+sort -u user4.tmp > blockUser
+
 
 sed -e s,.access.log\,, final2 > final3
 #удаляем дубли
@@ -99,7 +105,7 @@ sort -u final3 > final4
 
 done < $FILE
 #rm -rf final2 final3
-
+	
 FILE=final4
 while read ban; do
 #     echo "user: $ban"
@@ -128,8 +134,27 @@ ipdatemin=$(date +"%Y-%m-%dT%H:%M" --date '+5 min')
 #iptables -I INPUT -s $ip/32 -m time --utc --datestart $ipdate --datestop $ipdatemin -j DROP
 
 #echo "         if (`$remote_addr` ~ ($ip)) {         return 404;}" >> vhosts/$user/*site.conf
+
+
 done < $FILE
 
+FILE=blockUser
+while read blockUser; do
+
+	usr=$(echo $blockUser | awk -F "." '{print $1}')
+
+	if grep -q $usr vhosts/$usr/*site.conf; then
+	echo запись существует
+	else
+	echo $usr >> vhosts/$usr/*site.conf
+	echo "заблокировано"
+	fi
+
+
+
+done < $FILE
+
+#rm final2 final3 ip2.tmp log2.tmp log.id number2 user4.tmp user.id
 
 else
 echo не выполняем
