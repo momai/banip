@@ -1,6 +1,6 @@
  #!/bin/bash
 echo  "##"
-echo -e "\033[37;1;41m  version 0.4 \033[0m fix defining the last line "
+echo -e "\033[37;1;41m  version 0.4.3 \033[0m add block nginx config "
 
 #Выполняем действие, если кол-во подключений к nginx больше connect в данный момент
 connect="0"
@@ -15,11 +15,26 @@ logfiles=log
 home="/home/momai/test/banip/banip"
 cd $home
 
+# Путь до etc/nginx/vhosts-resources/
+#conf="/etc/nginx/vhosts-resources/"
+conf= $home/vhosts/
+
 realconnect=$(netstat -an | grep :443 | wc -l)
+
+
+FILE=blockUser
+while read blockUser; do
+
+        usr=$(echo $blockUser | awk -F "." '{print $1}')
+	rm $conf/$usr/blackhole.conf
+
+
+done < $FILE
+
 
 #echo $realconnect
 if [ $realconnect -ge $connect ]; then
-echo выполняем
+echo run
 
 #rm -rf user.id log.id log2.tmp ip2.tmp number2 final2 final3 final4
 #ищем логи
@@ -28,16 +43,9 @@ find $logfiles/ -name "*access*"  -type f -exec basename {} \; > log.id
 
 
 
-#FILE=user.id
-#while read user; do
-#     echo "user: $user"
-#done < $FILE
-
-
-
 FILE=log.id
 while read log; do
-     echo "log: $log"
+#     echo "log: $log"
 
 	
 lo="$log"
@@ -48,18 +56,18 @@ LANG=en_us_8859_1
 logfile=$logfiles/$log
 
 #вычесляем время последней записи. Берётся 5я строчка с конца файла
-t=$(tail -n1 $logfile | awk -F ":" '{print $2 $3}')
+#t=$(tail -n1 $logfile | awk -F ":" '{print $2 $3}')
 
-#t=$(cat $logfile | tail -n 5 | head -1 | awk -F ":" '{print $2 $3}')
+t=$(cat $logfile | tail -n 5 | head -1 | awk -F ":" '{print $2 $3}')
 
 d=$(date -d "$t 5 minute ago" "+%H%M" )
 
-echo t= $t
-echo d= $d
+#echo t= $t
+#echo d= $d
 
 #убираем дату (на проде убрать --date '-37 day')
 dfix=$(date +"%d/%b/%Y:")
-echo dfix= $dfix
+#echo dfix= $dfix
 
 #выводить имена учетных записей ipsmanager в конечный файл
 cat $logfile | awk -v lo="$lo" -v sp="	" -F "$dfix" '{print lo sp $1 $2}' | awk -F ":" '{print $1 $2}'  > log2.tmp
@@ -143,20 +151,32 @@ while read blockUser; do
 
 	usr=$(echo $blockUser | awk -F "." '{print $1}')
 
-	if grep -q $usr vhosts/$usr/*site.conf; then
-	echo запись существует
-	else
-	echo $usr >> vhosts/$usr/*site.conf
-	echo "заблокировано"
-	fi
+# для записи в главный файл конфигурации nginx
+#	if grep -q $usr vhosts/$usr/*site.conf; then
+#	echo запись существует
+#	else
+#	echo $usr >> vhosts/$usr/*site.conf
+#	echo "заблокировано"
+#	fi
 
 
+# создание отдельного файла конфигурации nginx
+
+if [ -e $home/vhosts/$usr/blackhole.conf ]
+then
+# если файл существует
+echo "block site"
+else
+# иначе — создать файл и сделать в нем новую запись
+cp $home/blackhole.conf $home/vhosts/$usr/blackhole.conf
+echo "block only site"
+fi
 
 done < $FILE
 
-#rm final2 final3 ip2.tmp log2.tmp log.id number2 user4.tmp user.id
 
 else
 echo не выполняем
 fi
 
+rm final2 final3 ip2.tmp log2.tmp log.id number2 user4.tmp user.id
