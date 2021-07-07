@@ -161,7 +161,7 @@ while read blockUser; do
 
 # создание отдельного файла конфигурации nginx
 
-if [ -e $home/vhosts/$usr/blackhole.conf ]
+if [ -e $conf/$usr/blackhole.conf ]
 then
 # если файл существует
 echo "block site"
