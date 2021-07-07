@@ -178,4 +178,6 @@ else
 echo не выполняем
 fi
 
+service nginx reload
+
 rm final2 final3 ip2.tmp log2.tmp log.id number2 user4.tmp user.id
