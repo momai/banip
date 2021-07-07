@@ -1,6 +1,6 @@
  #!/bin/bash
 echo  "##"
-echo -e "\033[37;1;41m  version 0.4.3 \033[0m add block nginx config "
+echo -e "\033[37;1;41m  version 0.4.4 \033[0m add block nginx config "
 
 #Выполняем действие, если кол-во подключений к nginx больше connect в данный момент
 connect="0"
@@ -15,7 +15,7 @@ logfiles=log
 home="/home/momai/test/banip/banip"
 cd $home
 
-# Путь до etc/nginx/vhosts-resources/
+# Путь до /etc/nginx/vhosts-resources/
 conf="/etc/nginx/vhosts-resources"
 
 realconnect=$(netstat -an | grep :443 | wc -l)
