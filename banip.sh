@@ -16,8 +16,7 @@ home="/home/momai/test/banip/banip"
 cd $home
 
 # Путь до etc/nginx/vhosts-resources/
-#conf="/etc/nginx/vhosts-resources/"
-conf= $home/vhosts/
+conf="/etc/nginx/vhosts-resources"
 
 realconnect=$(netstat -an | grep :443 | wc -l)
 
