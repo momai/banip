@@ -1,6 +1,6 @@
  #!/bin/bash
 echo  "##"
-echo -e "\033[37;1;41m  version 0.4.4 \033[0m add block nginx config "
+echo -e "\033[37;1;41m  version 0.4.5 \033[0m add block nginx config "
 
 #Выполняем действие, если кол-во подключений к nginx больше connect в данный момент
 connect="0"
@@ -167,7 +167,7 @@ then
 echo "block site"
 else
 # иначе — создать файл и сделать в нем новую запись
-cp $home/blackhole.conf $home/vhosts/$usr/blackhole.conf
+cp $home/blackhole.conf $conf/$usr/blackhole.conf
 echo "block only site"
 fi
 
