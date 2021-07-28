@@ -1,6 +1,6 @@
  #!/bin/bash
 echo  "##"
-echo -e "\033[37;1;41m  version 0.4.5 \033[0m add block nginx config "
+echo -e "\033[37;1;41m  version 0.4.6 \033[0m"
 
 #Выполняем действие, если кол-во подключений к nginx больше connect в данный момент
 connect="0"
@@ -15,9 +15,9 @@ logfiles=log
 home="/home/momai/test/banip/banip"
 cd $home
 
-# Путь до /etc/nginx/vhosts-resources/
+# Путь до /etc/nginx/vhosts-resources
 conf="/etc/nginx/vhosts-resources"
-
+#conf="/home/momai/test/banip/banip/vhosts-resources"
 realconnect=$(netstat -an | grep :443 | wc -l)
 
 
@@ -25,9 +25,7 @@ FILE=blockUser
 while read blockUser; do
 
         usr=$(echo $blockUser | awk -F "." '{print $1}')
-	rm $conf/$usr/blackhole.conf
-
-
+	rm $conf/${usr}*/blackhole.conf
 done < $FILE
 
 
@@ -50,7 +48,7 @@ while read log; do
 lo="$log"
 #lo=$(cat '$log' | awk -F "." '{print $1}')
 #lo=$(cat '$log' | cut -d "." -f 1)
-echo "$lo"
+#echo "$lo"
 LANG=en_us_8859_1
 logfile=$logfiles/$log
 
@@ -64,7 +62,7 @@ d=$(date -d "$t 5 minute ago" "+%H%M" )
 #echo t= $t
 #echo d= $d
 
-#убираем дату (на проде убрать --date '-37 day')
+#убираем дату (на проде убрать --date '-65 day')
 dfix=$(date +"%d/%b/%Y:")
 #echo dfix= $dfix
 
@@ -161,21 +159,23 @@ while read blockUser; do
 
 # создание отдельного файла конфигурации nginx
 
-if [ -e $conf/$usr/blackhole.conf ]
+if [ -e $conf/${usr}*/blackhole.conf ]
 then
 # если файл существует
 echo "block site"
 else
 # иначе — создать файл и сделать в нем новую запись
-cp $home/blackhole.conf $conf/$usr/blackhole.conf
+cd $conf/${usr}*
+cp $home/blackhole.conf .
+#cp $home/blackhole.conf $conf/${usr}*/blackhole.conf
 echo "block only site"
 fi
 
 done < $FILE
-
+cd $home
 
 else
-echo не выполняем
+echo quit script
 fi
 
 service nginx reload
