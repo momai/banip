@@ -1,6 +1,6 @@
  #!/bin/bash
 echo  "##"
-echo -e "\033[37;1;41m  version 0.4.6 \033[0m"
+echo -e "\033[37;1;41m  version 0.5.1 \033[0m"
 
 #Выполняем действие, если кол-во подключений к nginx больше connect в данный момент
 connect="0"
@@ -21,10 +21,16 @@ conf="/etc/nginx/vhosts-resources"
 realconnect=$(netstat -an | grep :443 | wc -l)
 
 
+#имя файла с перечисленными заблокированными именами пользователей
+userlist=userlist.txt
+
+rm $userlist
+
 FILE=blockUser
 while read blockUser; do
 
         usr=$(echo $blockUser | awk -F "." '{print $1}')
+#	echo $usr >> $userlist
 	rm $conf/${usr}*/blackhole.conf
 done < $FILE
 
@@ -62,7 +68,7 @@ d=$(date -d "$t 5 minute ago" "+%H%M" )
 #echo t= $t
 #echo d= $d
 
-#убираем дату (на проде убрать --date '-65 day')
+#убираем дату (на проде убрать --date '-78 day')
 dfix=$(date +"%d/%b/%Y:")
 #echo dfix= $dfix
 
@@ -147,18 +153,10 @@ FILE=blockUser
 while read blockUser; do
 
 	usr=$(echo $blockUser | awk -F "." '{print $1}')
-
-# для записи в главный файл конфигурации nginx
-#	if grep -q $usr vhosts/$usr/*site.conf; then
-#	echo запись существует
-#	else
-#	echo $usr >> vhosts/$usr/*site.conf
-#	echo "заблокировано"
-#	fi
-
+	echo $usr >> $home/$userlist
+#	echo=$usr >> block
 
 # создание отдельного файла конфигурации nginx
-
 if [ -e $conf/${usr}*/blackhole.conf ]
 then
 # если файл существует
