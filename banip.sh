@@ -1,10 +1,11 @@
- #!/bin/bash
+#!/bin/bash
 echo  "##"
 echo -e "\033[37;1;41m  version 0.5.1 \033[0m"
 
 #Выполняем действие, если кол-во подключений к nginx больше connect в данный момент
 connect="0"
-
+#Выполняется действие (при соблюдении условия connect), если кол-во обращений на один хост больше больше banconnect (на основе лога nginx за последние 5 минут)
+banconnect="120"
 #Выполняется действие (при соблюдении условия connect), если кол-во обращений с одного IP больше n (на основе лога nginx за последние 5 минут)
 n=0
 
@@ -16,8 +17,8 @@ home="/home/momai/test/banip/banip"
 cd $home
 
 # Путь до /etc/nginx/vhosts-resources
-conf="/etc/nginx/vhosts-resources"
-#conf="/home/momai/test/banip/banip/vhosts-resources"
+#conf="/etc/nginx/vhosts-resources"
+conf="/home/momai/test/banip/banip/vhosts-resources"
 realconnect=$(netstat -an | grep :443 | wc -l)
 
 
@@ -68,8 +69,8 @@ d=$(date -d "$t 5 minute ago" "+%H%M" )
 #echo t= $t
 #echo d= $d
 
-#убираем дату (на проде убрать --date '-78 day')
-dfix=$(date +"%d/%b/%Y:")
+#убираем дату (на проде убрать --date '-132 day')
+dfix=$(date +"%d/%b/%Y:" --date '-131 day')
 #echo dfix= $dfix
 
 #выводить имена учетных записей ipsmanager в конечный файл
@@ -101,8 +102,6 @@ sed -e s,.access.log\,, final2 > final3
 #удаляем дубли
 sort -u final3 > final4
 
-#rm -rf log.tmp ip.tmp
-
 
 #FILE=final
 #while read IP; do
@@ -115,6 +114,28 @@ sort -u final3 > final4
 #cat $logfile
 
 done < $FILE
+
+
+#cat final4 | awk '$0=$1' | uniq -c > final5
+#sort -n final4 | awk ' {print $2} ' | uniq -c > final5
+#FILE=final5
+#while read test2; do
+
+#blockid=$(echo $test2 | awk '{print $1}')
+#blockuser=$(echo $test2 | awk '{print $2}')
+#echo $blockid $blockuser
+
+# если blockid больше banconnect - то блочим хост
+
+#if [ $blockid -ge $banconnect ]; then
+#fi
+
+#test2=$(cat final5 | awk '{print $1}')
+#test2=$(awk ' {print $1} ')
+#echo "TEST2 = $test2"
+
+#done < $FILE
+
 #rm -rf final2 final3
 	
 FILE=final4
@@ -148,7 +169,8 @@ ipdatemin=$(date +"%Y-%m-%dT%H:%M" --date '+5 min')
 
 
 done < $FILE
-
+function blockfunc {
+cd $home
 FILE=blockUser
 while read blockUser; do
 
@@ -170,6 +192,58 @@ echo "block only site"
 fi
 
 done < $FILE
+}
+#blockfunc
+
+cd $home
+cat final4 | awk '$0=$1' | uniq -c > final5
+#sort -n final4 | awk ' {print $2} ' | uniq -c > final5
+FILE=final5
+while read test2; do
+
+blockid=$(echo $test2 | awk '{print $1}')
+blockuser=$(echo $test2 | awk '{print $2}')
+echo $blockid
+echo $blockuser
+
+# если blockid больше banconnect - то блочим хост
+
+if [ $blockid -ge $banconnect ]; then
+cd $home
+FILE=final5
+while read final5; do
+
+        usr=$blockuser
+        echo $usr >> $home/$userlist
+#       echo=$usr >> block
+
+# создание отдельного файла конфигурации nginx
+#if [ -e $conf/${usr}*/blackhole.conf ]; then
+# если файл существует
+#echo "сайт $usr уже заблокирован"
+#else
+# иначе — создать файл и сделать в нем новую запись
+cd $conf/${usr}*
+cp $home/blackhole.conf .
+#cp $home/blackhole.conf $conf/${usr}*/blackhole.conf
+echo "сайт $usr заблокирован"
+#fi
+
+done < $FILE
+
+
+else
+echo not block1
+fi
+
+#test2=$(cat final5 | awk '{print $1}')
+#test2=$(awk ' {print $1} ')
+#echo "TEST2 = $test2"
+
+done < $FILE
+
+
+
 cd $home
 
 else
@@ -178,4 +252,4 @@ fi
 
 service nginx reload
 
-rm final2 final3 ip2.tmp log2.tmp log.id number2 user4.tmp user.id
+#rm final2 final3 ip2.tmp log2.tmp log.id number2 user4.tmp user.id
