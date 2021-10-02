@@ -208,6 +208,14 @@ echo $blockuser
 
 # если blockid больше banconnect - то блочим хост
 
+
+
+#test2=$(cat final5 | awk '{print $1}')
+#test2=$(awk ' {print $1} ')
+#echo "TEST2 = $test2"
+
+done < $FILE
+cd $home
 if [ $blockid -ge $banconnect ]; then
 cd $home
 FILE=final5
@@ -235,14 +243,6 @@ done < $FILE
 else
 echo not block1
 fi
-
-#test2=$(cat final5 | awk '{print $1}')
-#test2=$(awk ' {print $1} ')
-#echo "TEST2 = $test2"
-
-done < $FILE
-
-
 
 cd $home
 
