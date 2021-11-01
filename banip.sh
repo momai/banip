@@ -5,7 +5,7 @@ echo -e "\033[37;1;41m  version 0.5.1 \033[0m"
 #Выполняем действие, если кол-во подключений к nginx больше connect в данный момент
 connect="0"
 #Выполняется действие (при соблюдении условия connect), если кол-во обращений на один хост больше больше banconnect (на основе лога nginx за последние 5 минут)
-banconnect="120"
+banconnect="0"
 #Выполняется действие (при соблюдении условия connect), если кол-во обращений с одного IP больше n (на основе лога nginx за последние 5 минут)
 n=0
 
@@ -70,7 +70,7 @@ d=$(date -d "$t 5 minute ago" "+%H%M" )
 #echo d= $d
 
 #убираем дату (на проде убрать --date '-132 day')
-dfix=$(date +"%d/%b/%Y:" --date '-131 day')
+dfix=$(date +"%d/%b/%Y:" --date '-162 day')
 #echo dfix= $dfix
 
 #выводить имена учетных записей ipsmanager в конечный файл
@@ -215,7 +215,7 @@ echo $blockuser
 #echo "TEST2 = $test2"
 
 done < $FILE
-cd $home
+
 if [ $blockid -ge $banconnect ]; then
 cd $home
 FILE=final5
