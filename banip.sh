@@ -17,8 +17,8 @@ home="/home/momai/test/banip/banip"
 cd $home
 
 # Путь до /etc/nginx/vhosts-resources
-#conf="/etc/nginx/vhosts-resources"
-conf="/home/momai/test/banip/banip/vhosts-resources"
+conf="/etc/nginx/vhosts-resources"
+#conf="/home/momai/test/banip/banip/vhosts-resources"
 realconnect=$(netstat -an | grep :443 | wc -l)
 
 
@@ -69,8 +69,8 @@ d=$(date -d "$t 5 minute ago" "+%H%M" )
 #echo t= $t
 #echo d= $d
 
-#убираем дату (на проде убрать --date '-132 day')
-dfix=$(date +"%d/%b/%Y:" --date '-162 day')
+#убираем дату (на проде убрать --date '-162 day')
+dfix=$(date +"%d/%b/%Y:")
 #echo dfix= $dfix
 
 #выводить имена учетных записей ipsmanager в конечный файл
@@ -193,7 +193,7 @@ fi
 
 done < $FILE
 }
-#blockfunc
+blockfunc
 
 cd $home
 cat final4 | awk '$0=$1' | uniq -c > final5
