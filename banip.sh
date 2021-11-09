@@ -55,13 +55,13 @@ while read log; do
 lo="$log"
 #lo=$(cat '$log' | awk -F "." '{print $1}')
 #lo=$(cat '$log' | cut -d "." -f 1)
+#lo=$(cat '$log' | cut -d "." -f 2)
 #echo "$lo"
 LANG=en_us_8859_1
 logfile=$logfiles/$log
 
 #вычесляем время последней записи. Берётся 5я строчка с конца файла
 #t=$(tail -n1 $logfile | awk -F ":" '{print $2 $3}')
-
 t=$(cat $logfile | tail -n 5 | head -1 | awk -F ":" '{print $2 $3}')
 
 d=$(date -d "$t 5 minute ago" "+%H%M" )
