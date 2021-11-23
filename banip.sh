@@ -1,11 +1,11 @@
 #!/bin/bash
 echo  "##"
-echo -e "\033[37;1;41m  version 0.5.1 \033[0m"
+echo -e "\033[37;1;41m  version 0.6.0 \033[0m"
 
 #Выполняем действие, если кол-во подключений к nginx больше connect в данный момент
 connect="0"
 #Выполняется действие (при соблюдении условия connect), если кол-во обращений на один хост больше больше banconnect (на основе лога nginx за последние 5 минут)
-banconnect="0"
+banconnect="1"
 #Выполняется действие (при соблюдении условия connect), если кол-во обращений с одного IP больше n (на основе лога nginx за последние 5 минут)
 n=0
 
@@ -23,15 +23,18 @@ realconnect=$(netstat -an | grep :443 | wc -l)
 
 
 #имя файла с перечисленными заблокированными именами пользователей
-userlist=userlist.txt
+usertempblock=usertempblock.txt
 
+usertemplist=usertemplist.txt
+
+rm $usertempblock
+rm $usertemplist
 rm $userlist
-
 FILE=blockUser
 while read blockUser; do
 
         usr=$(echo $blockUser | awk -F "." '{print $1}')
-#	echo $usr >> $userlist
+#	echo $usr >> $usertempblock
 	rm $conf/${usr}*/blackhole.conf
 done < $FILE
 
@@ -69,7 +72,7 @@ d=$(date -d "$t 5 minute ago" "+%H%M" )
 #echo t= $t
 #echo d= $d
 
-#убираем дату (на проде убрать --date '-162 day')
+#убираем дату (на проде убрать --date '-183 day')
 dfix=$(date +"%d/%b/%Y:")
 #echo dfix= $dfix
 
@@ -175,8 +178,15 @@ FILE=blockUser
 while read blockUser; do
 
 	usr=$(echo $blockUser | awk -F "." '{print $1}')
-	echo $usr >> $home/$userlist
+	echo $usr >> $home/$usertempblock
 #	echo=$usr >> block
+
+#Определение юзера
+nametmp=$conf/${usr}.*/*.conf
+echo name = $nametmp
+name=$(echo $nametmp | awk -F "/" '{print $NF}' | sed 's/.conf$//')
+echo name - $name
+echo $name >> $home/$usertemplist
 
 # создание отдельного файла конфигурации nginx
 if [ -e $conf/${usr}*/blackhole.conf ]
@@ -203,7 +213,7 @@ while read test2; do
 
 blockid=$(echo $test2 | awk '{print $1}')
 blockuser=$(echo $test2 | awk '{print $2}')
-echo $blockid
+echo blockid = $blockid
 echo $blockuser
 
 # если blockid больше banconnect - то блочим хост
@@ -222,8 +232,15 @@ FILE=final5
 while read final5; do
 
         usr=$blockuser
-        echo $usr >> $home/$userlist
+        echo $usr >> $home/$usertempblock
 #       echo=$usr >> block
+
+#Определение юзера
+nametmp=$conf/${usr}.*/*.conf
+echo name = $nametmp
+name=$(echo $nametmp | awk -F "/" '{print $NF}' | sed 's/.conf$//')
+echo name - $name
+echo $name >> $home/$usertemplist
 
 # создание отдельного файла конфигурации nginx
 #if [ -e $conf/${usr}*/blackhole.conf ]; then
@@ -238,6 +255,9 @@ echo "сайт $usr заблокирован"
 #fi
 
 done < $FILE
+
+
+uniq $home/$usertemplist > $home/userlist.txt
 
 
 else
