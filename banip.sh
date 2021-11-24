@@ -1,6 +1,6 @@
 #!/bin/bash
 echo  "##"
-echo -e "\033[37;1;41m  version 0.6.0 \033[0m"
+echo -e "\033[37;1;41m  version 0.6.1 \033[0m"
 
 #Выполняем действие, если кол-во подключений к nginx больше connect в данный момент
 connect="0"
@@ -17,8 +17,8 @@ home="/home/momai/test/banip/banip"
 cd $home
 
 # Путь до /etc/nginx/vhosts-resources
-conf="/etc/nginx/vhosts-resources"
-#conf="/home/momai/test/banip/banip/vhosts-resources"
+#conf="/etc/nginx/vhosts-resources"
+conf="/home/momai/test/banip/banip/vhosts-resources"
 realconnect=$(netstat -an | grep :443 | wc -l)
 
 
@@ -26,6 +26,8 @@ realconnect=$(netstat -an | grep :443 | wc -l)
 usertempblock=usertempblock.txt
 
 usertemplist=usertemplist.txt
+
+userlist=userlist.txt
 
 rm $usertempblock
 rm $usertemplist
@@ -73,18 +75,14 @@ d=$(date -d "$t 5 minute ago" "+%H%M" )
 #echo d= $d
 
 #убираем дату (на проде убрать --date '-183 day')
-dfix=$(date +"%d/%b/%Y:")
+dfix=$(date +"%d/%b/%Y:"  --date '-184 day')
 #echo dfix= $dfix
 
 #выводить имена учетных записей ipsmanager в конечный файл
 cat $logfile | awk -v lo="$lo" -v sp="	" -F "$dfix" '{print lo sp $1 $2}' | awk -F ":" '{print $1 $2}'  > log2.tmp
-#cat log2.tmp
-#сформировать список ип адресов в конечном файле
-#cat $logfile | awk -F "$dfix" '{print $1 $2}' | awk -F ":" '{print $1 $2}'  > log2.tmp
-
 #вырезаем отрезок из логов
 sed -n -i "/${d}/,/${t}/{//!p}" log2.tmp
-#cat log.tmp
+
 #парсим адреса
 cat log2.tmp | awk -F '- -' '{print $1}' > ip2.tmp
 
@@ -106,72 +104,8 @@ sed -e s,.access.log\,, final2 > final3
 sort -u final3 > final4
 
 
-#FILE=final
-#while read IP; do
-#     echo "IP: $IP"
-#done < $FILE
-	
-
-
-
-#cat $logfile
-
 done < $FILE
 
-
-#cat final4 | awk '$0=$1' | uniq -c > final5
-#sort -n final4 | awk ' {print $2} ' | uniq -c > final5
-#FILE=final5
-#while read test2; do
-
-#blockid=$(echo $test2 | awk '{print $1}')
-#blockuser=$(echo $test2 | awk '{print $2}')
-#echo $blockid $blockuser
-
-# если blockid больше banconnect - то блочим хост
-
-#if [ $blockid -ge $banconnect ]; then
-#fi
-
-#test2=$(cat final5 | awk '{print $1}')
-#test2=$(awk ' {print $1} ')
-#echo "TEST2 = $test2"
-
-#done < $FILE
-
-#rm -rf final2 final3
-	
-FILE=final4
-while read ban; do
-#     echo "user: $ban"
-
-#echo $ban >> vhosts/$ban/*site.conf
-
-#если final4 со списокм пользователей, то: print $1 - user, print $2 - IP.
-#если final4 только с IP то: print $1 - ip. user игнорируется
-user=$(echo $ban | awk -F " " '{print $1}')
-ip=$(echo $ban | awk -F " " '{print $2}')
-
-#echo $user
-#echo $ip
-
-#echo $ip >> vhosts/$user/*site.conf
-
-#awk 'NR==5{print "new line text"}7' file
-
-#echo $ip | awk '{print $(NF-1)}'
-
-ipdate=$(date +"%Y-%m-%dT%H:%M")
-ipdatemin=$(date +"%Y-%m-%dT%H:%M" --date '+5 min')
-
-#iptables -t filter -A INTPUT -s $ip/32 -m time --utc --datestart $ipdate --datestop $ipdatemin -j DROP
-
-#iptables -I INPUT -s $ip/32 -m time --utc --datestart $ipdate --datestop $ipdatemin -j DROP
-
-#echo "         if (`$remote_addr` ~ ($ip)) {         return 404;}" >> vhosts/$user/*site.conf
-
-
-done < $FILE
 function blockfunc {
 cd $home
 FILE=blockUser
@@ -183,23 +117,23 @@ while read blockUser; do
 
 #Определение юзера
 nametmp=$conf/${usr}.*/*.conf
-echo name = $nametmp
+#echo name = $nametmp
 name=$(echo $nametmp | awk -F "/" '{print $NF}' | sed 's/.conf$//')
-echo name - $name
+#echo name - $name
 echo $name >> $home/$usertemplist
 
 # создание отдельного файла конфигурации nginx
-if [ -e $conf/${usr}*/blackhole.conf ]
-then
+#if [ -e $conf/${usr}*/blackhole.conf ]
+#then
 # если файл существует
-echo "block site"
-else
+#echo "сайт $usr пользователя $name уже заблокирован"
+#else
 # иначе — создать файл и сделать в нем новую запись
 cd $conf/${usr}*
 cp $home/blackhole.conf .
 #cp $home/blackhole.conf $conf/${usr}*/blackhole.conf
-echo "block only site"
-fi
+echo "сайт $usr пользователя $name заблокирован"
+#fi
 
 done < $FILE
 }
@@ -208,21 +142,17 @@ blockfunc
 cd $home
 cat final4 | awk '$0=$1' | uniq -c > final5
 #sort -n final4 | awk ' {print $2} ' | uniq -c > final5
+
 FILE=final5
 while read test2; do
 
 blockid=$(echo $test2 | awk '{print $1}')
 blockuser=$(echo $test2 | awk '{print $2}')
-echo blockid = $blockid
-echo $blockuser
+#echo blockid = $blockid
+#echo $blockuser
 
 # если blockid больше banconnect - то блочим хост
 
-
-
-#test2=$(cat final5 | awk '{print $1}')
-#test2=$(awk ' {print $1} ')
-#echo "TEST2 = $test2"
 
 done < $FILE
 
@@ -237,27 +167,27 @@ while read final5; do
 
 #Определение юзера
 nametmp=$conf/${usr}.*/*.conf
-echo name = $nametmp
+#echo name = $nametmp
 name=$(echo $nametmp | awk -F "/" '{print $NF}' | sed 's/.conf$//')
-echo name - $name
+#echo name - $name
 echo $name >> $home/$usertemplist
 
 # создание отдельного файла конфигурации nginx
-#if [ -e $conf/${usr}*/blackhole.conf ]; then
+if [ -e $conf/${usr}*/blackhole.conf ]; then
 # если файл существует
-#echo "сайт $usr уже заблокирован"
-#else
+echo "сайт1 $usr пользователя $name уже заблокирован"
+else
 # иначе — создать файл и сделать в нем новую запись
 cd $conf/${usr}*
 cp $home/blackhole.conf .
 #cp $home/blackhole.conf $conf/${usr}*/blackhole.conf
-echo "сайт $usr заблокирован"
-#fi
+echo "сайт1 $usr пользователя $name заблокирован"
+fi
 
 done < $FILE
 
 
-uniq $home/$usertemplist > $home/userlist.txt
+uniq $home/$usertemplist > $home/$userlist
 
 
 else
@@ -271,5 +201,13 @@ echo quit script
 fi
 
 service nginx reload
+cd $home
+rm final2 final3 ip2.tmp log2.tmp log.id user4.tmp user.id usertempblock.txt usertemplist.txt final4
 
-#rm final2 final3 ip2.tmp log2.tmp log.id number2 user4.tmp user.id
+# Вставить описание в созданные файлы
+
+sed -i '1s/^/# Таблица ИП и кол-во обращений с него к хосту. за последние 5 минут, на основе лога nginx\n/' $home/number2
+
+sed -i '1s/^/# Кол-во обращений на определенный хост за последние 5 минут\n/' $home/final5
+
+sed -i '1s/^/# Список заблокированных пользователей\n/' $home/$userlist
