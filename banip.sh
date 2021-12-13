@@ -1,6 +1,6 @@
 #!/bin/bash
 echo  "##"
-echo -e "\033[37;1;41m  version 0.6.1 \033[0m"
+echo -e "\033[37;1;41m  version 0.6.2 \033[0m"
 
 #Выполняем действие, если кол-во подключений к nginx больше connect в данный момент
 connect="0"
@@ -50,8 +50,6 @@ echo run
 find $logfiles/. -name "*access*" -type f -exec basename {} \; | cut -d "." -f 1 > user.id
 find $logfiles/ -name "*access*"  -type f -exec basename {} \; > log.id
 
-
-
 FILE=log.id
 while read log; do
 #     echo "log: $log"
@@ -74,8 +72,8 @@ d=$(date -d "$t 5 minute ago" "+%H%M" )
 #echo t= $t
 #echo d= $d
 
-#убираем дату (на проде убрать --date '-183 day')
-dfix=$(date +"%d/%b/%Y:"  --date '-184 day')
+#убираем дату (на проде убрать --date '-184 day')
+dfix=$(date +"%d/%b/%Y:")
 #echo dfix= $dfix
 
 #выводить имена учетных записей ipsmanager в конечный файл
