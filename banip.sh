@@ -40,7 +40,7 @@ while read blockUser; do
 	rm $conf/${usr}*/blackhole.conf
 done < $FILE
 
-
+touch $home/userlist.txt
 #echo $realconnect
 if [ $realconnect -ge $connect ]; then
 echo run
