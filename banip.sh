@@ -62,6 +62,7 @@ lo="$log"
 #echo "$lo"
 LANG=en_us_8859_1
 logfile=$logfiles/$log
+logfile3=$logfiles/$log
 
 #вычесляем время последней записи. Берётся 5я строчка с конца файла
 #t=$(tail -n1 $logfile | awk -F ":" '{print $2 $3}')
